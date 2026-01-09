@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src * 'unsafe-inline'; script-src * 'unsafe-inline'; media-src * blob:;">
+    <title>MCEM · 科技助手</title>
+    <style>
+        :root {
+            --primary-color: #00ffaa;    /* 主色调：霓虹绿 */
+            --secondary-color: #00ccff;  /* 辅助色：霓虹蓝 */
+            --accent-color: #ff3366;     /* 强调色：霓虹粉 */
+            --buy-color: #ffcc00;        /* 购买按钮色：霓虹黄 */
+            --tutorial-color: #9966ff;   /* 教程按钮色：霓虹紫 */
+            --bg-color: #0a0a12;         /* 背景色：深空黑 */
+            --card-bg: #121228;          /* 卡片背景：暗紫 */
+            --text-color: #ffffff;       /* 文本颜色：白 */
+            --shadow: 0 0 20px rgba(0, 255, 170, 0.5); /* 发光效果 */
+            --buy-shadow: 0 0 20px rgba(255, 204, 0, 0.5); /* 购买按钮发光 */
+            --tutorial-shadow: 0 0 20px rgba(153, 102, 255, 0.5); /* 教程按钮发光 */
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(0, 255, 170, 0.1) 0%, transparent 30%),
+                radial-gradient(circle at 80% 80%, rgba(0, 204, 255, 0.1) 0%, transparent 30%);
+            background-attachment: fixed;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        /* 顶部导航（新增登录状态显示） */
+        header {
+            background: linear-gradient(135deg, rgba(18, 18, 40, 0.9), rgba(0, 0, 0, 0.9));
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .user-controls {
+            display: flex;
+            gap: 1rem;
+        }
+        .auth-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: none;
+            background: rgba(0, 204, 255, 0.2);
+            color: var(--secondary-color);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .auth-btn:hover {
+            background: rgba(0, 204, 255, 0.4);
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+        }
+        .logout-btn {
+            background: rgba(255, 51, 102, 0.2);
+            color: var(--accent-color);
+        }
+        .logout-btn:hover {
+            background: rgba(255, 51, 102, 0.4);
+            box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+        }
+        .admin-tag {
+            background: rgba(255, 51, 102, 0.3);
+            color: var(--accent-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        /* 英雄区域 */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        /* 功能卡片 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 255, 170, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow), 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-color: var(--primary-color);
+        }
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            background-color: rgba(0, 255, 170, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        /* 下载、购买与教程区域 */
+        .action-section {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(0, 204, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .action-section h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--secondary-color);
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .download-btn {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 204, 255, 0.3);
+            cursor: pointer;
+        }
+        .download-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 204, 255, 0.5);
+        }
+        /* 购买按钮样式 */
+        .buy-btn {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            background: linear-gradient(135deg, var(--buy-color), #ff9900);
+            color: #0a0a12;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
+            cursor: pointer;
+        }
+        .buy-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--buy-shadow), 0 10px 25px rgba(255, 204, 0, 0.5);
+        }
+        /* 教程按钮样式 */
+        .tutorial-btn {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            background: linear-gradient(135deg, var(--tutorial-color), #7a4fff);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(153, 102, 255, 0.3);
+            cursor: pointer;
+        }
+        .tutorial-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--tutorial-shadow), 0 10px 25px rgba(153, 102, 255, 0.5);
+        }
+        .version-info {
+            margin-top: 1.5rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+        /* 登录注册弹窗 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid var(--primary-color);
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .close-modal:hover {
+            color: var(--accent-color);
+        }
+        .modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 170, 0.3);
+            background-color: rgba(0, 0, 0, 0.3);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(0, 255, 170, 0.3);
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 1.2rem;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 255, 170, 0.3);
+        }
+        .form-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+        }
+        .form-switch a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .error-message {
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 1rem;
+            height: 1.2rem;
+            font-size: 0.9rem;
+        }
+        /* 管理员专属区域 - 升级样式 */
+        .admin-section {
+            background-color: rgba(255, 51, 102, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(255, 51, 102, 0.3);
+            display: none;
+        }
+        .admin-section.active {
+            display: block;
+        }
+        .admin-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-color);
+            text-align: center;
+        }
+        .admin-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .admin-tab {
+            padding: 0.8rem 1.5rem;
+            border-radius: 20px;
+            border: none;
+            background: rgba(255, 51, 102, 0.2);
+            color: var(--accent-color);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .admin-tab.active {
+            background: linear-gradient(135deg, var(--accent-color), #ff6699);
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+        }
+        .admin-tab:hover:not(.active) {
+            background: rgba(255, 51, 102, 0.3);
+            box-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
+        }
+        .admin-content {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 51, 102, 0.2);
+        }
+        .admin-content.hidden {
+            display: none;
+        }
+        .announcement-form textarea {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 170, 0.3);
+            background-color: rgba(0, 0, 0, 0.3);
+            color: var(--text-color);
+            font-size: 1rem;
+            min-height: 120px;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+        .announcement-list {
+            margin-top: 1.5rem;
+        }
+        .announcement-item {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--accent-color);
+        }
+        .announcement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        .announcement-time {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .announcement-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .announcement-btn {
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+            border: none;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .edit-btn {
+            background: rgba(0, 204, 255, 0.2);
+            color: var(--secondary-color);
+        }
+        .edit-btn:hover {
+            background: rgba(0, 204, 255, 0.4);
+        }
+        .delete-btn {
+            background: rgba(255, 51, 102, 0.2);
+            color: var(--accent-color);
+        }
+        .delete-btn:hover {
+            background: rgba(255, 51, 102, 0.4);
+        }
+        .success-message {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 1rem;
+            height: 1.2rem;
+            font-size: 0.9rem;
+        }
+        /* 公告预览区域（所有用户可见） */
+        .announcement-section {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(0, 204, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .announcement-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .announcement-section h2::before {
+            content: "📢";
+            font-size: 1.5rem;
+        }
+        .no-announcement {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 1rem 0;
+        }
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .action-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .download-btn, .buy-btn, .tutorial-btn {
+                width: 100%;
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+            .admin-tabs {
+                gap: 0.5rem;
+            }
+            .admin-tab {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header>
+        <div class="header-top">
+            <div></div>
+            <div id="user-area">
+                <!-- 登录状态动态显示 -->
+                <div class="user-controls" id="auth-buttons">
+                    <button class="auth-btn" id="login-btn">登录</button>
+                    <button class="auth-btn" id="register-btn">注册</button>
+                </div>
+                <div class="user-info" id="logged-user" style="display: none;">
+                    <span id="username-display"></span>
+                    <span id="role-tag"></span>
+                    <button class="auth-btn logout-btn" id="logout-btn">退出</button>
+                </div>
+            </div>
+        </div>
+        <div class="logo">MCEM</div>
+        <div class="subtitle">网易我的世界 · 科技助手</div>
+    </header>
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 英雄区域 -->
+        <section class="hero">
+            <h1>解锁我的世界无限可能</h1>
+            <p>MCEM 科技助手，为网易我的世界玩家打造的专业辅助工具，让你的游戏体验与众不同。支持安卓 8.1 及以上版本，功能强大，稳定可靠。</p>
+        </section>
+
+        <!-- 公告预览区域（所有用户可见） -->
+        <section class="announcement-section" id="announcement-preview">
+            <h2>最新公告</h2>
+            <div id="public-announcement-list" class="announcement-list">
+                <!-- 公告内容将动态加载 -->
+                <div class="no-announcement">暂无公告，敬请期待...</div>
+            </div>
+        </section>
+
+        <!-- 功能展示（7个指定功能） -->
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">✈️</div>
+                <h3>飞行</h3>
+                <p>摆脱重力束缚，自由翱翔天际，快速探索广阔地图。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🚪</div>
+                <h3>穿墙</h3>
+                <p>穿透任意方块阻碍，直达目的地，无视地形限制。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">👑</div>
+                <h3>上帝模式</h3>
+                <p>无敌状态+无限资源，随心所欲打造专属世界。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🗡️</div>
+                <h3>百米大刀</h3>
+                <p>超长攻击范围，一键秒杀多个目标，战斗效率倍增。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚔️</div>
+                <h3>杀戮光环</h3>
+                <p>自动锁定并攻击周围敌对生物，轻松刷怪升级。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>矿物透视</h3>
+                <p>穿透方块直观显示矿物位置，快速寻找稀有资源。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📦</div>
+                <h3>快速拿箱</h3>
+                <p>一键提取箱子内所有物品，无需手动逐个拾取。</p>
+            </div>
+        </section>
+        <!-- 下载、购买与教程区域 -->
+        <section class="action-section">
+            <h2>获取 MCEM 科技助手</h2>
+            <div class="action-buttons">
+                <a href="mqqapi://card/show_pslcard?src_type=internal&version=1&uin=1020304410&card_type=group&source=qrcode" class="download-btn">点击加入 QQ 群下载</a>
+                <a href="https://xx.youxi186.com/shop/MCEM" target="_blank" class="buy-btn">前往官方购买卡密</a>
+                <!-- 新增使用教程视频按钮，跳转指定B站链接 -->
+                <a href="https://b23.tv/JXifdz0" target="_blank" class="tutorial-btn">查看使用教程视频</a>
+            </div>
+            <div class="version-info">
+                最新版本：v2.0.1 | 支持：安卓 8.1 及以上 | 群号：1020304410
+            </div>
+        </section>
+        <!-- 管理员专属区域 - 升级功能 -->
+        <section class="admin-section" id="admin-section">
+            <h2>管理员控制台</h2>
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="announcement">公告管理</button>
+                <button class="admin-tab" data-tab="user">用户管理</button>
+                <button class="admin-tab" data-tab="order">订单处理</button>
+            </div>
+
+            <!-- 公告管理面板 -->
+            <div class="admin-content" id="announcement-tab">
+                <h3 style="color: var(--accent-color); margin-bottom: 1rem;">发布新公告</h3>
+                <div class="announcement-form">
+                    <textarea id="new-announcement" placeholder="请输入公告内容（支持换行）"></textarea>
+                    <button class="submit-btn" id="publish-announcement">发布公告</button>
+                    <div class="success-message" id="announcement-success"></div>
+                </div>
+
+                <h3 style="color: var(--accent-color); margin: 1.5rem 0 1rem;">已发布公告</h3>
+                <div id="admin-announcement-list" class="announcement-list">
+                    <!-- 管理员公告列表将动态加载 -->
+                    <div class="no-announcement">暂无已发布公告</div>
+                </div>
+            </div>
+
+            <!-- 用户管理面板（占位） -->
+            <div class="admin-content hidden" id="user-tab">
+                <p>用户管理功能即将上线，敬请期待...</p>
+                <!-- 可后续扩展：用户列表、权限修改、账号禁用等功能 -->
+            </div>
+
+            <!-- 订单处理面板（占位） -->
+            <div class="admin-content hidden" id="order-tab">
+                <p>订单处理功能即将上线，敬请期待...</p>
+                <!-- 可后续扩展：订单查询、卡密验证、退款处理等功能 -->
+            </div>
+        </section>
+    </div>
+    <!-- 页脚 -->
+    <footer>
+        <p>© 2025 MCEM 科技助手 | 仅供学习交流，请勿用于非法用途</p>
+    </footer>
+    <!-- 登录弹窗 -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-login">&times;</span>
+            <h2 class="modal-title">用户登录</h2>
+            <div class="error-message" id="login-error"></div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label">账号</label>
+                    <input type="text" class="form-input" id="login-username" placeholder="请输入账号" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">密码</label>
+                    <input type="password" class="form-input" id="login-password" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="submit-btn">登录</button>
+                <div class="form-switch">
+                    没有账号？<a href="javascript:;" id="go-register">立即注册</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- 注册弹窗 -->
+    <div class="modal" id="register-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-register">&times;</span>
+            <h2 class="modal-title">用户注册</h2>
+            <div class="error-message" id="register-error"></div>
+            <form id="register-form">
+                <div class="form-group">
+                    <label class="form-label">账号</label>
+                    <input type="text" class="form-input" id="reg-username" placeholder="请设置账号" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">密码</label>
+                    <input type="password" class="form-input" id="reg-password" placeholder="请设置密码" required>
+                </div>
+                <button type="submit" class="submit-btn">注册</button>
+                <div class="form-switch">
+                    已有账号？<a href="javascript:;" id="go-login">立即登录</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        // 修复：从localStorage加载用户数据（持久化存储，刷新不丢失）
+        let USERS = JSON.parse(localStorage.getItem('mcem_users')) || {
+            'xiaoba': { password: 'qwer', role: 'admin', name: '管理员' },
+            '123': { password: '123', role: 'user', name: '普通用户' }
+        };
+        // 公告数据存储（localStorage持久化）
+        let ANNOUNCEMENTS = JSON.parse(localStorage.getItem('mcem_announcements')) || [];
+        // 状态管理
+        let currentUser = null;
+        // DOM 元素
+        const loginModal = document.getElementById('login-modal');
+        const registerModal = document.getElementById('register-modal');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const closeLogin = document.getElementById('close-login');
+        const closeRegister = document.getElementById('close-register');
+        const goRegister = document.getElementById('go-register');
+        const goLogin = document.getElementById('go-login');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const loginError = document.getElementById('login-error');
+        const registerError = document.getElementById('register-error');
+        const authButtons = document.getElementById('auth-buttons');
+        const loggedUser = document.getElementById('logged-user');
+        const usernameDisplay = document.getElementById('username-display');
+        const roleTag = document.getElementById('role-tag');
+        const adminSection = document.getElementById('admin-section');
+        const downloadBtn = document.querySelector('.download-btn');
+        // 管理员面板元素
+        const adminTabs = document.querySelectorAll('.admin-tab');
+        const adminContents = document.querySelectorAll('.admin-content');
+        const publishAnnouncementBtn = document.getElementById('publish-announcement');
+        const newAnnouncementText = document.getElementById('new-announcement');
+        const announcementSuccess = document.getElementById('announcement-success');
+        const adminAnnouncementList = document.getElementById('admin-announcement-list');
+        const publicAnnouncementList = document.getElementById('public-announcement-list');
+
+        // 初始化检查登录状态和公告
+        window.addEventListener('load', () => {
+            checkLoginStatus();
+            renderPublicAnnouncements();
+            renderAdminAnnouncements();
+            // 修复：绑定表单提交事件（防止事件丢失）
+            bindFormEvents();
+        });
+
+        // 模态框控制（优化：确保模态框正常显示/隐藏）
+        function openModal(modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // 修复：清除错误提示
+            if (modal === loginModal) loginError.textContent = '';
+            if (modal === registerModal) registerError.textContent = '';
+        }
+        function closeModal(modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // 登录状态检查（优化：修复localStorage读取逻辑）
+        function checkLoginStatus() {
+            const savedUser = localStorage.getItem('mcem_current_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUserInterface();
+            }
+        }
+
+        // 更新用户界面（优化：确保登录状态正确切换）
+        function updateUserInterface() {
+            if (currentUser) {
+                authButtons.style.display = 'none';
+                loggedUser.style.display = 'flex';
+                usernameDisplay.textContent = currentUser.name;
+                if (currentUser.role === 'admin') {
+                    roleTag.innerHTML = '<span class="admin-tag">管理员</span>';
+                    adminSection.classList.add('active');
+                } else {
+                    roleTag.textContent = '';
+                    adminSection.classList.remove('active');
+                }
+            } else {
+                authButtons.style.display = 'flex';
+                loggedUser.style.display = 'none';
+                adminSection.classList.remove('active');
+            }
+        }
+
+        // 绑定表单事件（修复：独立封装，确保事件正确绑定）
+        function bindFormEvents() {
+            // 登录表单提交
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('login-username').value.trim();
+                const password = document.getElementById('login-password').value.trim();
+                
+                // 输入验证
+                if (!username || !password) {
+                    loginError.textContent = '账号和密码不能为空';
+                    return;
+                }
+                
+                // 验证账号密码（修复：正确读取USERS数据）
+                const user = USERS[username];
+                if (user && user.password === password) {
+                    currentUser = {
+                        username: username,
+                        name: user.name,
+                        role: user.role
+                    };
+                    // 保存登录状态（修复：存储当前登录用户）
+                    localStorage.setItem('mcem_current_user', JSON.stringify(currentUser));
+                    closeModal(loginModal);
+                    updateUserInterface();
+                    loginError.textContent = '';
+                    loginForm.reset();
+                } else {
+                    loginError.textContent = '账号或密码错误';
+                }
+            });
+
+            // 注册表单提交（修复：用户数据持久化）
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('reg-username').value.trim();
+                const password = document.getElementById('reg-password').value.trim();
+                
+                // 输入验证
+                if (!username || !password) {
+                    registerError.textContent = '账号和密码不能为空';
+                    return;
+                }
+                if (username.length < 3) {
+                    registerError.textContent = '账号长度不能少于3位';
+                    return;
+                }
+                if (USERS[username]) {
+                    registerError.textContent = '该账号已存在';
+                    return;
+                }
+                
+                // 注册新用户（修复：保存到localStorage，刷新不丢失）
+                USERS[username] = { password: password, role: 'user', name: username };
+                localStorage.setItem('mcem_users', JSON.stringify(USERS));
+                
+                registerError.textContent = '注册成功，请登录';
+                registerError.style.color = 'var(--primary-color)';
+                
+                setTimeout(() => {
+                    closeModal(registerModal);
+                    openModal(loginModal);
+                    registerForm.reset();
+                    registerError.textContent = '';
+                    registerError.style.color = '';
+                }, 1500);
+            });
+        }
+
+        // 退出登录（修复：清除登录状态）
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('mcem_current_user');
+            currentUser = null;
+            updateUserInterface();
+        });
+
+        // 模态框切换事件（修复：确保切换正常）
+        loginBtn.addEventListener('click', () => openModal(loginModal));
+        registerBtn.addEventListener('click', () => openModal(registerModal));
+        closeLogin.addEventListener('click', () => closeModal(loginModal));
+        closeRegister.addEventListener('click', () => closeModal(registerModal));
+        goRegister.addEventListener('click', () => {
+            closeModal(loginModal);
+            openModal(registerModal);
+        });
+        goLogin.addEventListener('click', () => {
+            closeModal(registerModal);
+            openModal(loginModal);
+        });
+
+        // 点击模态框外部关闭（优化：增强兼容性）
+        window.addEventListener('click', function(e) {
+            if (e.target === loginModal) closeModal(loginModal);
+            if (e.target === registerModal) closeModal(registerModal);
+        });
+
+        // 下载按钮唤起QQ失败处理
+        downloadBtn.addEventListener('click', function(e) {
+            setTimeout(function() {
+                // 可添加失败提示
+                // alert("请手动打开QQ搜索群号 1020304410");
+            }, 1000);
+        });
+
+        // 管理员面板标签切换
+        adminTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                adminTabs.forEach(t => t.classList.remove('active'));
+                adminContents.forEach(c => c.classList.add('hidden'));
+                tab.classList.add('active');
+                const targetTab = tab.getAttribute('data-tab');
+                document.getElementById(`${targetTab}-tab`).classList.remove('hidden');
+            });
+        });
+
+        // 发布公告功能
+        publishAnnouncementBtn.addEventListener('click', () => {
+            const content = newAnnouncementText.value.trim();
+            if (!content) {
+                announcementSuccess.textContent = '公告内容不能为空';
+                announcementSuccess.style.color = 'var(--accent-color)';
+                setTimeout(() => {
+                    announcementSuccess.textContent = '';
+                }, 2000);
+                return;
+            }
+
+            const announcement = {
+                id: Date.now(),
+                content: content,
+                time: new Date().toLocaleString(),
+                publisher: currentUser.name
+            };
+
+            ANNOUNCEMENTS.unshift(announcement);
+            localStorage.setItem('mcem_announcements', JSON.stringify(ANNOUNCEMENTS));
+
+            newAnnouncementText.value = '';
+            announcementSuccess.textContent = '公告发布成功！';
+            announcementSuccess.style.color = 'var(--primary-color)';
+            renderAdminAnnouncements();
+            renderPublicAnnouncements();
+
+            setTimeout(() => {
+                announcementSuccess.textContent = '';
+            }, 2000);
+        });
+
+        // 渲染管理员公告列表
+        function renderAdminAnnouncements() {
+            if (ANNOUNCEMENTS.length === 0) {
+                adminAnnouncementList.innerHTML = '<div class="no-announcement">暂无已发布公告</div>';
+                return;
+            }
+
+            adminAnnouncementList.innerHTML = ANNOUNCEMENTS.map(ann => `
+                <div class="announcement-item" data-id="${ann.id}">
+                    <div class="announcement-header">
+                        <span>发布于 ${ann.time}（${ann.publisher}）</span>
+                        <div class="announcement-actions">
+                            <button class="announcement-btn edit-btn" onclick="editAnnouncement(${ann.id})">编辑</button>
+                            <button class="announcement-btn delete-btn" onclick="deleteAnnouncement(${ann.id})">删除</button>
+                        </div>
+                    </div>
+                    <div class="announcement-content">${ann.content.replace(/\n/g, '<br>')}</div>
+                </div>
+            `).join('');
+        }
+
+        // 渲染公共公告列表
+        function renderPublicAnnouncements() {
+            if (ANNOUNCEMENTS.length === 0) {
+                publicAnnouncementList.innerHTML = '<div class="no-announcement">暂无公告，敬请期待...</div>';
+                return;
+            }
+
+            const latestAnnouncements = ANNOUNCEMENTS.slice(0, 3);
+            publicAnnouncementList.innerHTML = latestAnnouncements.map(ann => `
+                <div class="announcement-item">
+                    <div class="announcement-header">
+                        <span>发布于 ${ann.time}</span>
+                        <span class="announcement-time">管理员发布</span>
+                    </div>
+                    <div class="announcement-content">${ann.content.replace(/\n/g, '<br>')}</div>
+                </div>
+            `).join('');
+        }
+
+        // 编辑公告
+        window.editAnnouncement = function(id) {
+            const annIndex = ANNOUNCEMENTS.findIndex(a => a.id === id);
+            if (annIndex === -1) return;
+
+            const newContent = prompt('请修改公告内容：', ANNOUNCEMENTS[annIndex].content);
+            if (newContent === null || newContent.trim() === '') return;
+
+            ANNOUNCEMENTS[annIndex] = {
+                ...ANNOUNCEMENTS[annIndex],
+                content: newContent.trim(),
+                time: new Date().toLocaleString()
+            };
+
+            localStorage.setItem('mcem_announcements', JSON.stringify(ANNOUNCEMENTS));
+            renderAdminAnnouncements();
+            renderPublicAnnouncements();
+        }
+
+        // 删除公告
+        window.deleteAnnouncement = function(id) {
+            if (!confirm('确定要删除这条公告吗？')) return;
+
+            ANNOUNCEMENTS = ANNOUNCEMENTS.filter(ann => ann.id !== id);
+            localStorage.setItem('mcem_announcements', JSON.stringify(ANNOUNCEMENTS));
+            renderAdminAnnouncements();
+            renderPublicAnnouncements();
+        }
+
+        // 修复：解决部分浏览器不识别CSS变量的问题
+        if (!window.CSS || !window.CSS.supports('color', 'var(--primary-color)')) {
+            document.documentElement.style.setProperty('--primary-color', '#00ffaa');
+            document.documentElement.style.setProperty('--accent-color', '#ff3366');
+        }
+    </script>
+</body>
+</html>
